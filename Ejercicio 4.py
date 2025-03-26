@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 mods=["R","P"]
 theta=[2.3,8]
 tama=[20,50,200,500,1000]
-#tama=[5]
+
 data={}
 for th in theta:
     for i in tama:
@@ -32,7 +32,37 @@ for th in theta:
             data["R"+str(th)+ " "+ str(i)+" Estim_1"].append(estim_1)
             data["R"+str(th)+ " "+ str(i)+" Estim_2"].append(estim_2)
             l+=1
+#Sesgos:
+Sesgos={}
+Mse={}
+Effis={}
+for mo in mods:
+    for th in theta:
+        Effis[mo+str(th)]={}
+        for i in range(5):
+            exp1=sum(data[mo+str(th)+" "+str(tama[i])+" Estim_1"])/500
+            var1=sum((a-exp1)**2 for a in data[mo+str(th)+" "+str(tama[i])+" Estim_1"])/499
+            
+            Sesgos[mo+str(th)+" "+str(tama[i])+" Sesgo_E1"]=exp1-th
+            Mse[mo+str(th)+" "+str(tama[i])+" Mse_E1"]=var1+(exp1-th)**2
 
+            exp2=sum(data[mo+str(th)+" "+str(tama[i])+" Estim_2"])/500
+            var2=sum((a-exp2)**2 for a in data[mo+str(th)+" "+str(tama[i])+" Estim_2"])/499
+            
+            Sesgos[mo+str(th)+" "+str(tama[i])+" Sesgo_E2"]=exp2-th
+            Mse[mo+str(th)+" "+str(tama[i])+" Mse_E2"]=var2+(exp2-th)**2
+            eff=(var2+(exp2-th)**2)/(var1+(exp1-th)**2)
+            Effis[mo+str(th)][tama[i]]=eff
+
+for mo in mods:
+    for th in theta:
+        fig,axs=plt.subplots()
+        fig.text(0.8,0.015,mo+str(th))
+        axs.plot(Effis[mo+str(th)].keys(),Effis[mo+str(th)].values())
+        plt.show()
+
+
+        
 for mo in mods:
     for th in theta:
         fig, axs= plt.subplots(2,5)
@@ -43,10 +73,3 @@ for mo in mods:
             axs[1,i].boxplot(data[mo+str(th)+" "+str(tama[i])+" Estim_2"])
             axs[1,i].set_title(str(tama[i])+" Estim_2")
         plt.show()
-
-#Sesgos:
-Sesgos={}
-Mse={}
-            
-        
-        
